@@ -1,0 +1,46 @@
+BSD 3-Clause License
+
+Copyright (c) 2026, Ben Mazin
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+
+ADDITIONAL DISCLAIMER — SCIENTIFIC CALCULATIONS
+
+Supercalc is provided for educational and advisory purposes only. The values it
+produces — surface impedance, sheet kinetic inductance, single-spin density of
+states N0, derived film parameters, and the stored material data — are
+APPROXIMATE ESTIMATES from idealized models (e.g., the thin-film limit of
+Zmuidzinas 2012 Eq. 8, with a BCS or user-supplied gap ratio) and from
+literature values that are sample-, deposition-, and measurement-dependent.
+
+These results are ADVISORY ONLY and carry NO WARRANTY OF ANY KIND, express or
+implied, as to their accuracy, completeness, or fitness for any purpose. They
+must not be relied upon as the sole basis for any design, fabrication,
+procurement, safety, or financial decision. You are solely responsible for
+independently verifying every result against primary references and your own
+measurements before acting on it. Use is entirely at your own risk.

@@ -1,0 +1,635 @@
+/* Herriott Cell Calculator — LCARS "Starfleet science console" styling, matched to the
+   Mazin Lab main site (Okuda-era TNG bridge computer). True-black field, #ff9900 orange chrome,
+   Antonio condensed display caps, Barlow body, JetBrains Mono for all numeric/UI data, asymmetric
+   "elbow" radii, segmented tri-colour bars, CRT scanline overlay. The spot-pattern figure is the
+   viewscreen hero. No frameworks; fonts via the same Google import the main site uses. */
+
+@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&family=Barlow+Semi+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  /* structure */
+  --bg:          #000000;   /* page field — true black */
+  --bg-2:        #05060a;   /* viewscreen / input wells */
+  --panel:       #0a0c12;   /* raised console panels (sections, figures) */
+  --panel-2:     #0d0f17;   /* recessed / zebra / table headers */
+  --field:       #111520;   /* deepest wells (inputs) */
+
+  /* text */
+  --ink:         #e8ebf2;   /* primary readout text */
+  --ink-soft:    #8890a3;   /* secondary / captions */
+  --ink-dim:     #4d5366;   /* very dim */
+  --heading:     #ffffff;
+
+  /* LCARS Okudagram palette */
+  --orange:      #ff9900;   /* PRIMARY chrome */
+  --gold:        #ffcc66;   /* secondary warm: labels, links, values */
+  --salmon:      #ff9966;   /* tertiary warm */
+  --peach:       #ffcc99;   /* pale warm fill */
+  --lilac:       #cc99cc;   /* cool accent */
+  --violet:      #9966cc;
+  --blue:        #9999cc;   /* ops accent */
+  --red:         #cc6666;   /* alert / exit */
+
+  /* lines + glows (no drop shadows — colored glows only) */
+  --border:        #1a1e2a;
+  --border-lcars:  rgba(255, 153, 0, 0.28);
+  --border-strong: rgba(255, 153, 0, 0.55);
+  --glow:          0 0 22px rgba(255, 153, 0, 0.20);
+  --glow-strong:   0 0 26px rgba(255, 153, 0, 0.42);
+
+  --radius:       4px;
+  --radius-elbow: 4px 4px 18px 4px;   /* console-panel bottom-right bulge */
+  --radius-pill:  4px 26px 26px 4px;  /* interactive elbow (squared left / round right) */
+  --gap:          1.05rem;
+
+  --display: 'Antonio', 'Barlow Condensed', Impact, system-ui, sans-serif;
+  --body:    'Barlow Semi Condensed', system-ui, -apple-system, sans-serif;
+  --mono:    'JetBrains Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+
+  /* reusable LCARS segmented bar (orange | gap | gold | gap | salmon) */
+  --segbar: linear-gradient(90deg,
+      var(--orange) 0 8%, transparent 8% 10%,
+      var(--gold) 10% 32%, transparent 32% 34%,
+      var(--salmon) 34% 64%, transparent 64% 66%,
+      var(--lilac) 66% 100%);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; font-size: 16px; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* CRT scanline overlay (matches main site body::before) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg, rgba(255, 153, 0, 0.02) 0px, rgba(255, 153, 0, 0.02) 1px,
+    transparent 1px, transparent 3px);
+  mix-blend-mode: screen;
+  opacity: 0.5;
+}
+
+::selection { background: var(--orange); color: #000; }
+
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb { background: var(--orange); border: 3px solid #000; border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+/* ---- Header / masthead -------------------------------------------------- */
+
+header {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1.8rem 1.5rem 0;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  margin: 0 0 0.7rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.eyebrow::before {
+  content: "";
+  width: 1.6em;
+  height: 0.6em;
+  background: var(--orange);
+  border-radius: 2px 8px 8px 2px;
+  flex: none;
+}
+
+header h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.7rem, 3.6vw, 2.9rem);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--heading);
+}
+
+/* pulsing status dot before the title (LCARS bridge indicator) */
+header h1::before {
+  content: "";
+  display: inline-block;
+  width: 0.46em;
+  height: 0.46em;
+  margin-right: 0.5em;
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow: 0 0 8px var(--orange);
+  vertical-align: 0.1em;
+  animation: lcarsPulse 2.2s ease-in-out infinite;
+}
+@keyframes lcarsPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+header .sub {
+  margin: 0.7rem 0 1.1rem;
+  font-family: var(--body);
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+/* segmented tri-colour bar closing the masthead */
+.masthead-bar {
+  max-width: 1180px;
+  margin: 0 auto;
+  height: 5px;
+  background: var(--segbar);
+  border-radius: 2px 10px 10px 2px;
+}
+
+/* ---- Two-column instrument layout -------------------------------------- */
+
+main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 3.5rem;
+  display: grid;
+  grid-template-columns: minmax(330px, 0.82fr) 1.18fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+section {
+  position: relative;
+  background: var(--panel);
+  border: 1.5px solid var(--border-lcars);
+  border-radius: var(--radius-elbow);
+  overflow: hidden;
+}
+
+/* left-edge LCARS colour bar on each console panel */
+section::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 6px; height: 100%;
+  background: var(--orange);
+}
+#results::after { background: var(--gold); }
+
+#inputs  { padding: 1.2rem 1.25rem 1.4rem 1.5rem; }
+#results { padding: 1.2rem 1.25rem 1.5rem 1.5rem; min-width: 0; }
+
+/* Comb + transmission plots live under the inputs to use the left column's height. */
+.plotopt { margin-top: 1rem; }
+.plots {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+  margin-top: 0.7rem;
+}
+.plots canvas { width: 100%; }
+
+/* Labelled section headers ("console panel" eyebrows) */
+#inputs::before,
+#results::before {
+  content: "Inputs ▸ Requirements";
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin: 0 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+#results::before { content: "Solution ▸ Geometry"; color: var(--gold); }
+
+/* ---- Form controls ------------------------------------------------------ */
+
+.row, .grid { display: grid; gap: 0.75rem 0.9rem; }
+.row  { grid-template-columns: 1fr 1fr; margin-bottom: 0.9rem; }
+.grid { grid-template-columns: 1fr 1fr; }
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-family: var(--display);
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+input, select {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--field);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--orange);
+  box-shadow: 0 0 0 1px var(--orange), var(--glow);
+}
+
+select {
+  appearance: none;
+  cursor: pointer;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--orange) 50%),
+    linear-gradient(135deg, var(--orange) 50%, transparent 50%);
+  background-position: right 0.9rem center, right 0.65rem center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 1.7rem;
+}
+
+input[type="number"] { font-variant-numeric: tabular-nums; }
+
+/* Outer-ring override sub-panel */
+#ringCtl {
+  margin: 0;
+  padding: 0.7rem 0.85rem 0.85rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-2);
+}
+#ringCtl legend {
+  padding: 0 0.45rem;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--salmon);
+}
+#ringCtl .grid { gap: 0.55rem 0.9rem; }
+
+label.check {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--ink-soft);
+}
+label.check input { width: auto; accent-color: var(--orange); }
+
+#ringCtl input:disabled,
+label.check input:disabled { opacity: 0.4; cursor: not-allowed; }
+
+button#solve {
+  width: 100%;
+  margin-top: 1.15rem;
+  padding: 0.75rem 1.4rem 0.75rem 1.1rem;
+  border: 1.5px solid var(--orange);
+  border-radius: var(--radius-pill);
+  background: var(--orange);
+  color: #000;
+  font-family: var(--display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.2s ease, transform 0.05s ease;
+}
+button#solve:hover { background: var(--gold); border-color: var(--gold); box-shadow: var(--glow-strong); }
+button#solve:active { transform: translateY(1px); }
+button#solve:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--gold), var(--glow-strong); }
+
+.binding {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+  margin: 1rem 0 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-lcars);
+  border-left: 4px solid var(--orange);
+  background: var(--panel-2);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  color: var(--gold);
+  min-height: 1.2em;
+}
+.binding::before {
+  content: "";
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow: 0 0 6px var(--orange);
+  flex: none;
+  animation: lcarsPulse 2.2s ease-in-out infinite;
+}
+.binding:empty { display: none; }
+
+/* ---- Figures: spot pattern is the viewscreen hero ---------------------- */
+
+.figs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+figure {
+  margin: 0;
+  padding: 0.6rem 0.6rem 0.45rem;
+  background: var(--panel-2);
+  border: 1.5px solid var(--border-lcars);
+  border-radius: 4px 4px 14px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+figcaption {
+  margin-top: 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+canvas, #schematic svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+
+/* Promote the spot-pattern figure to viewscreen hero: wider, orange frame + glow. */
+.figs:first-of-type { grid-template-columns: 1.25fr 1fr; }
+.figs:first-of-type figure:first-child {
+  border-color: var(--border-strong);
+  box-shadow: var(--glow);
+  background: var(--panel);
+}
+.figs:first-of-type figure:first-child canvas { width: 100%; }
+
+#schematic { display: flex; justify-content: center; }
+
+/* ---- Parameter readout table ------------------------------------------- */
+
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+
+#params {
+  margin-top: 0.4rem;
+  border: 1.5px solid var(--border-lcars);
+  border-left: 4px solid var(--orange);
+  border-radius: 4px 4px 12px 4px;
+  overflow: hidden;
+}
+
+#params th, #params td {
+  padding: 0.45rem 0.75rem;
+  text-align: left;
+  vertical-align: baseline;
+  border-bottom: 1px solid var(--border);
+}
+#params tr:last-child th, #params tr:last-child td { border-bottom: none; }
+
+#params th {
+  width: 60%;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+#params td {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold);
+  text-align: right;
+}
+
+#params tr:nth-child(even) { background: var(--panel-2); }
+#params tr:hover td, #params tr:hover th { background: rgba(255, 153, 0, 0.06); }
+
+/* ---- Alternatives table ------------------------------------------------- */
+
+#results h3 {
+  margin: 1.7rem 0 0.65rem;
+  padding-bottom: 0.6rem;
+  font-family: var(--display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--orange);
+  border-bottom: none;
+  position: relative;
+}
+#results h3::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 100%; height: 4px;
+  background: var(--segbar);
+  border-radius: 2px 8px 8px 2px;
+}
+
+#alts {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+#alts thead th {
+  padding: 0.42rem 0.5rem;
+  text-align: right;
+  font-weight: 600;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--orange);
+  background: var(--panel-2);
+  border-bottom: 2px solid var(--border-lcars);
+  white-space: nowrap;
+}
+#alts thead th:first-child { text-align: left; }
+
+#alts tbody td {
+  padding: 0.42rem 0.5rem;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  color: var(--ink);
+}
+#alts tbody td:first-child { text-align: left; color: var(--ink-soft); font-weight: 600; }
+
+#alts tbody tr { cursor: pointer; transition: background 0.12s ease; }
+#alts tbody tr:hover td { background: rgba(255, 153, 0, 0.07); }
+#alts tbody tr.selected td { background: rgba(255, 153, 0, 0.12); color: var(--gold); }
+#alts tbody tr.selected td:first-child {
+  color: var(--orange);
+  box-shadow: inset 4px 0 0 var(--orange);
+}
+
+/* ---- Responsive collapse ----------------------------------------------- */
+
+@media (max-width: 860px) {
+  main { grid-template-columns: 1fr; gap: 1.1rem; }
+  #inputs { position: relative; }
+}
+
+@media (max-width: 560px) {
+  body { font-size: 15px; }
+  .row, .grid, .figs, .figs:first-of-type { grid-template-columns: 1fr; }
+  header, main { padding-left: 1rem; padding-right: 1rem; }
+  #alts { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ===== Supercalc additions (override Herriott layout, add panels/table) === */
+
+/* Single-column stacked panels. */
+main { grid-template-columns: 1fr; }
+
+/* Per-panel left stripe colours. */
+#panel-n0::after       { background: var(--gold); }
+#panel-elements::after { background: var(--lilac); }
+
+#panel-impedance, #panel-n0, #panel-elements { padding: 1.2rem 1.25rem 1.4rem 1.5rem; }
+
+#panel-impedance::before, #panel-n0::before, #panel-elements::before {
+  display: flex; align-items: center; gap: 0.5em;
+  margin: 0 0 1rem; padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--orange);
+}
+#panel-impedance::before { content: "Surface Impedance \25B8 Zmuidzinas Eq. 8"; }
+#panel-n0::before        { content: "Density of States \25B8 N\2080 / Pulse Height"; color: var(--gold); }
+#panel-elements::before  { content: "Material Explorer \25B8 Elemental Superconductors"; color: var(--lilac); }
+
+/* Panel-1: preset sidebar + field grid. */
+.panel-2col { display: grid; grid-template-columns: minmax(150px, 0.3fr) 1fr; gap: 1.2rem; align-items: start; }
+.panel-main { min-width: 0; }
+.subhead {
+  margin: 0 0 0.6rem; font-family: var(--display); font-size: 0.8rem; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--salmon);
+}
+#presetBox { border-right: 1px solid var(--border); padding-right: 1rem; }
+#presetList { display: flex; flex-direction: column; gap: 0.5rem; }
+.preset-btn {
+  width: 100%; padding: 0.5rem 0.7rem; text-align: left; cursor: pointer;
+  border: 1.5px solid var(--border-lcars); border-radius: var(--radius-pill);
+  background: var(--panel-2); color: var(--gold);
+  font-family: var(--display); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;
+  transition: background 0.15s ease, box-shadow 0.2s ease;
+}
+.preset-btn:hover { background: rgba(255,153,0,0.1); box-shadow: var(--glow); }
+.preset-btn small { display: block; margin-top: 0.15rem; font-family: var(--mono); font-size: 0.62rem; color: var(--ink-soft); letter-spacing: 0; text-transform: none; }
+
+/* Field + readout grids. */
+.grid-5 { grid-template-columns: repeat(5, 1fr); }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.readout { margin-top: 1rem; }
+label.readonly output {
+  display: block; width: 100%; padding: 0.5rem 0.6rem; border: 1.5px solid var(--border);
+  border-radius: var(--radius); background: var(--panel-2); color: var(--gold);
+  font-family: var(--mono); font-size: 0.95rem; font-variant-numeric: tabular-nums;
+}
+
+.btn-secondary {
+  margin-top: 1rem; padding: 0.45rem 1.1rem; cursor: pointer;
+  border: 1.5px solid var(--border-lcars); border-radius: var(--radius-pill);
+  background: var(--panel-2); color: var(--gold);
+  font-family: var(--display); font-size: 0.8rem; letter-spacing: 0.16em; text-transform: uppercase;
+}
+.btn-secondary:hover { background: rgba(255,153,0,0.1); box-shadow: var(--glow); }
+
+/* Periodic table — teal "ambient superconductor" palette (Python PALETTE). */
+.ptable { display: grid; grid-template-columns: repeat(18, 1fr); gap: 3px; }
+.pcell {
+  aspect-ratio: 1; min-width: 0; padding: 2px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border: 1px solid var(--border); border-radius: 3px;
+  background: #101725; color: #738399; cursor: default;
+  font-family: var(--mono); overflow: hidden;
+}
+.pcell .pz   { font-size: 0.42rem; line-height: 1; opacity: 0.7; align-self: flex-start; }
+.pcell .psym { font-size: 0.78rem; font-weight: 700; line-height: 1.1; }
+.pcell:disabled { opacity: 0.5; }
+.pcell.super {
+  cursor: pointer; background: #06343d; border-color: #59fff2; color: #edf7ff;
+  box-shadow: 0 0 8px rgba(4,214,198,0.25);
+}
+.pcell.super .psym { color: #59fff2; }
+.pcell.super:hover { background: #0a5560; box-shadow: 0 0 14px rgba(89,255,242,0.5); }
+.pcell.super.selected { background: #04d6c6; color: #04222a; }
+.pcell.super.selected .psym { color: #04222a; }
+
+.ptable-legend { margin-top: 0.9rem; font-family: var(--mono); font-size: 0.72rem; color: var(--ink-soft); display: flex; align-items: center; gap: 0.5em; }
+.legend-swatch { display: inline-block; width: 1em; height: 1em; border-radius: 2px; }
+.legend-swatch.super { background: #04d6c6; border: 1px solid #59fff2; }
+
+@media (max-width: 860px) {
+  .panel-2col { grid-template-columns: 1fr; }
+  #presetBox { border-right: none; border-bottom: 1px solid var(--border); padding-right: 0; padding-bottom: 0.8rem; }
+  .grid-5 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .pcell .psym { font-size: 0.58rem; }
+  .pcell .pz { font-size: 0.32rem; }
+}
+
+/* Keep math/unit symbols (µ, ρ, Ω, η, θ, α) in natural case inside uppercased labels. */
+label .u { text-transform: none; }
+
+/* Panel-1 grid now holds 6 fields (5 linked + gap ratio). */
+.grid-6 { grid-template-columns: repeat(6, 1fr); }
+@media (max-width: 1100px) { .grid-6 { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 860px)  { .grid-6 { grid-template-columns: repeat(2, 1fr); } }
+
+/* Tc readout at the bottom of each superconducting cell. Colour splits at 1.3 K:
+   warm gold for Tc > 1.3 K, cool blue for Tc ≤ 1.3 K. */
+.pcell .ptc { font-size: 0.52rem; font-weight: 600; line-height: 1; margin-top: 2px; white-space: nowrap; }
+.pcell .ptc.tc-hi { color: #ffcc66; }
+.pcell .ptc.tc-lo { color: #6fb4ff; }
+.pcell.super.selected .ptc { color: #04222a; }
+@media (max-width: 560px) { .pcell .ptc { font-size: 0.44rem; } }

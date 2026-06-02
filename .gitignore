@@ -1,0 +1,14 @@
+node_modules/
+.DS_Store
+*.log
+
+# Agent / instruction files — not part of the deployed site
+CLAUDE.md
+AGENTS.md
+
+# Internal design docs and plans — kept local, out of the repo
+docs/
+
+# Periodic-table generator and its image outputs — not needed to run the site
+generate_superconducting_periodic_table.py
+superconducting_elements_dark_periodic_table.*

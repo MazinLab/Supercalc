@@ -1,0 +1,8 @@
+{
+  "name": "supercalc",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "Superconducting thin-film properties calculator (surface impedance, N0, periodic-table picker).",
+  "scripts": { "test": "node --test" }
+}

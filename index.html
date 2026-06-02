@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Supercalc — Superconducting Properties Calculator</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header>
+    <p class="eyebrow">Mazin Lab ▸ Superconducting Materials Console</p>
+    <h1>Supercalc</h1>
+    <p class="sub">Surface impedance (Zmuidzinas 2012, Eq. 8), single-spin density of states N₀, and an elemental-superconductor picker. Enter any three of Tc / ρ / t / L□ to solve the fourth.</p>
+  </header>
+  <div class="masthead-bar"></div>
+
+  <main>
+    <!-- Panel 1: Surface impedance -->
+    <section id="panel-impedance">
+      <div class="panel-2col">
+        <aside id="presetBox">
+          <h3 class="subhead">Materials</h3>
+          <div id="presetList"></div>
+        </aside>
+        <div class="panel-main">
+          <div class="grid grid-6">
+            <label>Tc <span class="u">(mK)</span><input id="f_tc" type="number" step="any" min="0" /></label>
+            <label>Resistivity <span class="u">ρ (µΩ·cm)</span><input id="f_rho" type="number" step="any" min="0" /></label>
+            <label>Sheet R<span class="u">ₙ (Ω/sq)</span><input id="f_rs" type="number" step="any" min="0" /></label>
+            <label>Thickness t <span class="u">(nm)</span><input id="f_t" type="number" step="any" min="0" /></label>
+            <label>Sheet L<span class="u">□ (pH/sq)</span><input id="f_lsq" type="number" step="any" min="0" /></label>
+            <label>Gap <span class="u">Δ/(k_B·Tc)</span><input id="f_gap" type="number" step="any" min="0" value="1.764" /></label>
+          </div>
+          <p id="impedance_msg" class="binding"></p>
+          <button id="clearImpedance" class="btn-secondary" type="button">Clear</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel 2: N0 / pulse height -->
+    <section id="panel-n0">
+      <div class="grid grid-2">
+        <label>Photon energy <span class="u">(eV)</span><input id="n_e" type="number" step="any" min="0" /></label>
+        <label>Wavelength <span class="u">(nm)</span><input id="n_lambda" type="number" step="any" min="0" /></label>
+        <label>Inductor height <span class="u">(µm)</span><input id="n_h" type="number" step="any" min="0" /></label>
+        <label>Inductor width <span class="u">(µm)</span><input id="n_w" type="number" step="any" min="0" /></label>
+        <label>Quality factor Q<input id="n_q" type="number" step="any" min="0" /></label>
+        <label>Phase pulse height <span class="u">θ (deg)</span><input id="n_theta" type="number" step="any" min="0" /></label>
+        <label>Kinetic ind. fraction <span class="u">αₖ</span><input id="n_alpha" type="number" step="any" min="0" max="1" value="1.0" /></label>
+        <label>Pair-breaking <span class="u">ηₚᵦ</span><input id="n_eta" type="number" step="any" value="0.57" /></label>
+        <label>Mattis-Bardeen <span class="u">S₂</span><input id="n_s2" type="number" step="any" value="1.0" /></label>
+      </div>
+      <div class="readout grid grid-2">
+        <label>N₀ <span class="u">(eV⁻¹ µm⁻³)</span><input id="n_n0_ev" type="number" step="any" min="0" /></label>
+        <label class="readonly">N₀ <span class="u">(J⁻¹ m⁻³)</span><output id="n_n0_si">—</output></label>
+      </div>
+      <p id="n0_msg" class="binding"></p>
+    </section>
+
+    <!-- Panel 3: Periodic-table picker -->
+    <section id="panel-elements">
+      <div id="ptableContainer"></div>
+      <p id="element_msg" class="binding"></p>
+      <div class="ptable-legend">
+        <span class="legend-swatch super"></span> Ambient-pressure elemental superconductor — click to load Tc &amp; ρ
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="js/ui.js"></script>
+</body>
+</html>
