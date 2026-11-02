@@ -16,53 +16,112 @@ deployable as-is on GitHub Pages.
 
 ## Panels
 
-1. **Surface impedance** (Zmuidzinas 2012, Eq. 8) — six linked fields: critical temperature
-   Tc, normal-state resistivity ρ, sheet resistance Rₙ, film thickness t, sheet kinetic
-   inductance L□, and the gap ratio Δ/(k_B·Tc). Enter any three of {Tc, ρ, t, L□} and the
-   rest solve by constraint propagation (Rₙ is a convenience field). The gap ratio defaults
-   to 1.764 (BCS); **leave it blank to solve it** from four over-determined measured values.
-   Click a saved lab film to prefill it — presets hold ρ and the gap constant, so changing
-   thickness updates L□.
+1. **Surface impedance.** Six linked fields: critical temperature Tc, normal state
+   resistivity ρ, sheet resistance R□, film thickness t, sheet inductance L□, and the gap
+   ratio Δ/(k_B·Tc). Enter any three of {Tc, ρ, t, L□} and the rest follow by constraint
+   propagation, with the penetration depth λ and gap energy Δ shown as readouts. The gap
+   ratio defaults to 1.764 (BCS). **Leave it blank to solve it** from four measured values,
+   and the solved value appears greyed in the empty field.
 
-2. **Density of states N₀ / pulse height** — from the material gap (panel 1) plus a measured
-   single-photon response: photon energy (or wavelength), inductor height and width
-   (thickness is inherited from panel 1), loaded quality factor Q, phase pulse height θ in
-   **degrees**, kinetic-inductance fraction αₖ, pair-breaking efficiency η_pb, and the
-   Mattis–Bardeen factor S₂. Computes the single-spin density of states N₀ in both
-   eV⁻¹·µm⁻³ and SI (J⁻¹·m⁻³). Bidirectional: enter θ to get N₀, or enter N₀ to get the
-   predicted θ.
+   R□, L□, and Tc alone fix t only through the excess of L□ over its thin film limit
+   ħR□/(πΔ). That excess is second order in t/λ, so the solver leaves t unsolved rather
+   than amplify rounding. Enter t or ρ as well. An L□ below the thin film limit is
+   rejected. Click a material preset to prefill it. Presets hold ρ, Tc, and the gap, so
+   changing the thickness updates L□.
 
-3. **Material explorer** — a periodic table of the ambient-pressure elemental
+2. **Density of states N₀ / pulse height.** Uses the gap and thickness from panel 1 plus a
+   measured single photon response:
+   - photon energy or wavelength
+   - the inductor's metal area (not its outline), which with t gives the active volume V
+   - the loaded Q, f₀, and bath temperature, which must be below Tc/2
+   - optionally the pulse decay time τ_qp
+   - the phase pulse height θ in degrees, as a loop phase θ₁ or a linearized phase θ₂
+   - α_k and η_pb
+
+   It computes the single spin N₀ in eV⁻¹·µm⁻³ and J⁻¹·m⁻³, and, with ρ from panel 1,
+   the diffusion constant D and the dirty limit coherence length ξ. The panel also runs
+   backward, from an entered N₀ to the predicted θ, and presets with a known N₀ load it.
+
+3. **Material explorer.** A periodic table of the ambient pressure elemental
    superconductors. Each clickable cell shows its Tc (gold above 1.3 K, blue below). Click
-   one to prefill panel 1 with a best-guess Tc and resistivity.
+   one to prefill panel 1 with its Tc, and with ρ where a low temperature film value is
+   stored.
 
 ## Physics
 
-With Δ = (gap ratio)·k_B·Tc, Rₙ = 10·ρ[µΩ·cm]/t[nm], and the thin-film limit of Eq. 8:
+The equations follow the Mazin Lab [MKIDopt](https://github.com/MazinLab/MKIDopt) model
+(`mkidopt/materials.py`, `resonator.py`, `optimal_filter.py`, `coordinates.py`).
+
+**Sheet inductance.** With Δ = (gap ratio)·k_B·Tc and ρ the normal state resistivity just
+above Tc:
 
 ```
-L□[pH/sq] = ħ·Rₙ / (π·Δ) · 1e12
-N₀        = η_pb·αₖ·S₂·Q·E / (4·Δ²·V·θ)      (V = h·w·t, θ in radians)
+λ  = √(ħρ / (πμ₀Δ))  ≈ 105 nm·√(ρ[µΩ·cm] / Tc[K])      Zmuidzinas 2012, Eq. 8
+L□ = (μ₀λ/2)·coth(t/2λ)
 ```
 
-The default gap ratio is the BCS weak-coupling value 1.764; real films often deviate (the
-Zobrist 2019 Hf preset solves to ≈2.86), so it is adjustable.
+For t ≪ λ this is ħR□/(πΔ) (Zmuidzinas Eqs. 7, 8, 12). For t ≫ λ it saturates at μ₀λ/2.
+The coth form is the London slab result for a strip carrying current on both faces, as in
+MKIDopt. A film over a ground plane, with field on one side only, has the same thin limit
+but a thick limit of μ₀λ. The thin limit is 15% low for 125 nm Nb (λ ≈ 86 nm) and below
+0.3% for the Hf, HfTa, and PtSi presets.
+
+**N₀ from a photon pulse** (Zmuidzinas Eqs. 64–72 and Gao 2008 thesis, Eqs. 2.96–2.99):
+
+```
+δn_qp = η_pb·E/(ΔV),  δσ₂/σ₂ = −S₂·δn_qp/(2N₀Δ),  δx = (α_k·γ/2)|δσ₂/σ₂|,  θ₂ = 4Q·δx
+⇒  N₀ = γ·η_pb·S₂·α_k·Q·E / (Δ²·V·θ₂)
+```
+
+- **γ:** with λ ∝ σ₂^(−1/2), the coth formula gives
+  γ = −dln L□/dln σ₂ = ½[1 + (t/λ)/sinh(t/λ)]. That is 1 for t ≪ λ and ½ for t ≫ λ
+  (Zmuidzinas Eq. 13). MKIDopt takes γ = 1, within 0.3% for its thin films. For 125 nm Nb
+  it is 0.86. α_k is the fraction of the total inductance contributed by L□.
+
+- **θ₂:** the exponential amplitude of the pulse in the linearized loop center phase
+  (Zobrist et al. 2021, JATIS 7, 010501).
+- **Loop phase:** a measured loop phase θ₁, with the tone on resonance, linearizes as
+  θ₂ = 2·tan(θ₁/2). At 90° that is 27% above θ₁. This assumes the pulse shifts the
+  frequency without changing the dissipation. Large pulses with a real dissipation response
+  mix the quadratures (Zobrist 2021), so enter a θ₂ linearized from both quadratures for
+  those.
+- **Pulse peak:** an observed pulse peak is h_max·θ₂, where h_max is the maximum of
+  (1 − e^(−t/τ_rise))·e^(−t/τ_qp) and τ_rise = Q/(πf₀). With τ_qp left blank, θ is taken as
+  the amplitude.
+- **S₂:** the thermal Mattis–Bardeen factor,
+  S₂ = 1 + √(2Δ/(πk_BT))·e^(−ξ)·I₀(ξ) with ξ = ħω/(2k_BT) (Zmuidzinas Eq. 72), at the bath
+  temperature. As T → 0 it tends to 1 + √(2Δ/(π²ħω)), not 1. That limit is 2.10 for the
+  PtSi preset at 5.67 GHz.
+- **η_pb:** defaults to 0.59 (Zobrist et al. 2022).
+- **D and ξ:** with N₀ and ρ, D = 1/(2e²N₀ρ) and ξ = √(ħD/Δ).
 
 References:
 - J. Zmuidzinas, *Superconducting Microresonators: Physics and Applications*, Annu. Rev.
-  Condens. Matter Phys. **3**, 169 (2012) — Eq. 8.
-- N₀ inversion follows the Mazin Lab MKIDopt responsivity model.
+  Condens. Matter Phys. **3**, 169 (2012).
+- J. Gao, PhD thesis, Caltech (2008).
+- N. Zobrist et al., J. Astron. Telesc. Instrum. Syst. **7**, 010501 (2021).
 
 ## Stored data
 
-All material data is pre-stored (no live fetch).
+All material data is stored in `js/materials.js` (no live fetch).
 
-- **Presets:** UCSB Hf (Zobrist 2019, 10.1063/1.5127768), UCSB PtSi (Szypryt 2017,
-  10.1364/oe.25.025894), UCSB WHf.
-- **Elements:** Tc and ρ for the 30 ambient-pressure elemental superconductors, preferring
-  thin-film literature values over bulk where available; each is tagged `film` or `bulk`
-  with a source. Resistivities are representative and approximate; several are unavailable
-  (stored as null). See the disclaimer above.
+- **Presets:**
+  - UCSB Nb, 125 nm. ρ = ρ(300 K)/RRR from a four probe run.
+  - From MKIDopt:
+    - HfTa with Tc = 0.8 K (unpublished 2026, provisional)
+    - PtSi from the MEC array (Zobrist et al. 2019, APL 115, 042601)
+    - the In/Hf bilayer (Zobrist et al. 2022, PRL 129, 017701)
+    - the UE2 default Hf film
+  - UCSB Hf (Zobrist et al. 2019, APL 115, 213503). Its published 97 µΩ·cm is the room
+    temperature value, so the preset uses 97/RRR with RRR = 1.6.
+  - UCSB WHf.
+
+  The MKIDopt TOML configs carry the full provenance of each MKIDopt preset.
+- **Elements:** Tc for the 30 ambient pressure elemental superconductors (Hg excluded), each
+  tagged `film` or `bulk` with a source. A resistivity is stored only where a low
+  temperature film value was found (Al, Ru, Ta). A bulk metal's residual resistivity is
+  set by its purity, and a room temperature handbook value overstates the film value by the
+  RRR, so neither belongs in the L□ formula. See the disclaimer above.
 
 ## Run locally
 

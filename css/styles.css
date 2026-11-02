@@ -542,7 +542,7 @@ main { grid-template-columns: 1fr; }
   font-family: var(--mono); font-size: 0.68rem; font-weight: 600;
   letter-spacing: 0.22em; text-transform: uppercase; color: var(--orange);
 }
-#panel-impedance::before { content: "Surface Impedance \25B8 Zmuidzinas Eq. 8"; }
+#panel-impedance::before { content: "Surface Impedance \25B8 Sheet Inductance at Any Thickness"; }
 #panel-n0::before        { content: "Density of States \25B8 N\2080 / Pulse Height"; color: var(--gold); }
 #panel-elements::before  { content: "Material Explorer \25B8 Elemental Superconductors"; color: var(--lilac); }
 

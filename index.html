@@ -10,7 +10,7 @@
   <header>
     <p class="eyebrow">Mazin Lab ▸ Superconducting Materials Console</p>
     <h1>Supercalc</h1>
-    <p class="sub">Surface impedance (Zmuidzinas 2012, Eq. 8), single-spin density of states N₀, and an elemental-superconductor picker. Enter any three of Tc / ρ / t / L□ to solve the fourth.</p>
+    <p class="sub">Sheet inductance of a film of any thickness (Zmuidzinas 2012; MKIDopt), single-spin density of states N₀ from a photon pulse, and an elemental-superconductor picker. Enter any three of Tc / ρ / t / L□ to solve the fourth.</p>
   </header>
   <div class="masthead-bar"></div>
 
@@ -31,6 +31,10 @@
             <label>Sheet L<span class="u">□ (pH/sq)</span><input id="f_lsq" type="number" step="any" min="0" /></label>
             <label>Gap <span class="u">Δ/(k_B·Tc)</span><input id="f_gap" type="number" step="any" min="0" value="1.764" /></label>
           </div>
+          <div class="readout grid grid-2">
+            <label class="readonly">Penetration depth <span class="u">λ (nm)</span><output id="f_lambda">—</output></label>
+            <label class="readonly">Gap energy <span class="u">Δ (µeV)</span><output id="f_delta">—</output></label>
+          </div>
           <p id="impedance_msg" class="binding"></p>
           <button id="clearImpedance" class="btn-secondary" type="button">Clear</button>
         </div>
@@ -42,17 +46,31 @@
       <div class="grid grid-2">
         <label>Photon energy <span class="u">(eV)</span><input id="n_e" type="number" step="any" min="0" /></label>
         <label>Wavelength <span class="u">(nm)</span><input id="n_lambda" type="number" step="any" min="0" /></label>
-        <label>Inductor height <span class="u">(µm)</span><input id="n_h" type="number" step="any" min="0" /></label>
-        <label>Inductor width <span class="u">(µm)</span><input id="n_w" type="number" step="any" min="0" /></label>
-        <label>Quality factor Q<input id="n_q" type="number" step="any" min="0" /></label>
+        <label>Inductor metal area <span class="u">(µm²)</span><input id="n_area" type="number" step="any" min="0" /></label>
+        <label>Loaded quality factor Q<input id="n_q" type="number" step="any" min="0" /></label>
+        <label>Resonance <span class="u">f₀ (GHz)</span><input id="n_f0" type="number" step="any" min="0" /></label>
+        <label>Bath temperature <span class="u">(mK)</span><input id="n_temp" type="number" step="any" min="0" /></label>
+        <label>Decay time <span class="u">τ<sub>qp</sub> (µs; blank: θ is the amplitude)</span><input id="n_tau" type="number" step="any" min="0" /></label>
         <label>Phase pulse height <span class="u">θ (deg)</span><input id="n_theta" type="number" step="any" min="0" /></label>
+        <label>Phase convention <span class="u">θ measured as</span>
+          <select id="n_theta_kind">
+            <option value="loop">loop phase θ₁ (tone on resonance, no dissipation change)</option>
+            <option value="linear">linearized phase θ₂</option>
+          </select>
+        </label>
         <label>Kinetic ind. fraction <span class="u">αₖ</span><input id="n_alpha" type="number" step="any" min="0" max="1" value="1.0" /></label>
-        <label>Pair-breaking <span class="u">ηₚᵦ</span><input id="n_eta" type="number" step="any" value="0.57" /></label>
-        <label>Mattis-Bardeen <span class="u">S₂</span><input id="n_s2" type="number" step="any" value="1.0" /></label>
+        <label>Pair-breaking <span class="u">ηₚᵦ</span><input id="n_eta" type="number" step="any" min="0" /></label>
       </div>
       <div class="readout grid grid-2">
         <label>N₀ <span class="u">(eV⁻¹ µm⁻³)</span><input id="n_n0_ev" type="number" step="any" min="0" /></label>
         <label class="readonly">N₀ <span class="u">(J⁻¹ m⁻³)</span><output id="n_n0_si">—</output></label>
+        <label class="readonly">Active volume <span class="u">V (µm³)</span><output id="n_vol">—</output></label>
+        <label class="readonly">Mattis-Bardeen <span class="u">S₂ (thermal)</span><output id="n_s2">—</output></label>
+        <label class="readonly">Thickness response <span class="u">γ = −dln L□/dln σ₂</span><output id="n_gamma">—</output></label>
+        <label class="readonly">Pulse peak / amplitude <span class="u">hₘₐₓ</span><output id="n_hmax">—</output></label>
+        <label class="readonly">Linearized amplitude <span class="u">θ₂ (deg)</span><output id="n_theta2">—</output></label>
+        <label class="readonly">Diffusion constant <span class="u">D (cm²/s)</span><output id="n_diff">—</output></label>
+        <label class="readonly">Coherence length <span class="u">ξ = √(ħD/Δ) (nm)</span><output id="n_xi">—</output></label>
       </div>
       <p id="n0_msg" class="binding"></p>
     </section>
