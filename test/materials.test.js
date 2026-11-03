@@ -2,7 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { PRESETS, ELEMENT_DATA } from '../js/materials.js';
 import { ELEMENTS } from '../js/periodic-table.js';
-import { solveTop } from '../js/superconductor.js';
+import { solveTop, responseGamma } from '../js/superconductor.js';
+import { computeN0, mattisBardeenS2, pulsePeakAmplitude } from '../js/n0.js';
+import { E_CHARGE } from '../js/constants.js';
 
 test('ELEMENT_DATA holds 30 ambient elements; Hg is intentionally excluded', () => {
   assert.equal(Object.keys(ELEMENT_DATA).length, 30);
@@ -46,9 +48,21 @@ test('MKIDopt presets reproduce the sheet inductance MKIDopt documents for them'
   }
 });
 
-test('gap-solving presets give a physical gap ratio (a room-temperature ρ gives ≈ 2.9)', () => {
-  for (const p of PRESETS.filter((q) => q.solve_gap)) {
-    const { gap } = solveTop({ tc_mK: p.tc_mK, rho: p.rho_uohmcm, t_nm: p.t_nm, lsq: p.lsq_pH, gap: null });
-    assert.ok(gap > 1.6 && gap < 2.2, `${p.name}: Δ/(k_B·Tc) = ${gap}`);
+test('MKIDopt paper resonators give back the N₀ that MKIDopt derives from η₀', () => {
+  // SimulationResult.N0_from_eta_per_J_m3 for each config; Supercalc adds the γ ≈ 1 factor.
+  const expected = { 'mkidopt-hfta': 1.474230250e47, 'mkidopt-ptsi': 8.714958854e46, 'mkidopt-inhf': 6.656746769e46 };
+  for (const [id, n0_eta] of Object.entries(expected)) {
+    const p = PRESETS.find((q) => q.id === id);
+    const ph = p.photon;
+    const film = solveTop({ tc_mK: p.tc_mK, rho: p.rho_uohmcm, t_nm: p.t_nm, gap: p.gap_ratio });
+    const delta_J = film.delta_ueV * E_CHARGE * 1e-6;
+    const hmax = pulsePeakAmplitude(ph.tau_us * 1e-6, ph.q / (Math.PI * ph.f0_GHz * 1e9));
+    const gamma = responseGamma(p.t_nm, film.lambda_nm);
+    const n0 = computeN0({
+      e_eV: ph.e_eV, volume_um3: ph.area_um2 * p.t_nm / 1000, q: ph.q, alpha_k: ph.alpha_k, gamma,
+      eta_pb: ph.eta_pb, s2: mattisBardeenS2(delta_J, ph.temp_mK / 1000, ph.f0_GHz * 1e9), delta_J,
+      theta2_rad: ph.theta2_peak_deg * Math.PI / 180 / hmax,
+    });
+    assert.ok(Math.abs(n0 - gamma * n0_eta) < 1e-4 * n0_eta, `${id}: N₀ ${n0} ≈ ${gamma * n0_eta}`);
   }
 });

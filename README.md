@@ -40,7 +40,8 @@ deployable as-is on GitHub Pages.
 
    It computes the single spin N₀ in eV⁻¹·µm⁻³ and J⁻¹·m⁻³, and, with ρ from panel 1,
    the diffusion constant D and the dirty limit coherence length ξ. The panel also runs
-   backward, from an entered N₀ to the predicted θ, and presets with a known N₀ load it.
+   backward, from an entered N₀ to the predicted θ. The three paper device presets fill it
+   with their resonator and a 2 eV photon.
 
 3. **Material explorer.** A periodic table of the ambient pressure elemental
    superconductors. Each clickable cell shows its Tc (gold above 1.3 K, blue below). Click
@@ -112,11 +113,15 @@ All material data is stored in `js/materials.js` (no live fetch).
     - PtSi from the MEC array (Zobrist et al. 2019, APL 115, 042601)
     - the In/Hf bilayer (Zobrist et al. 2022, PRL 129, 017701)
     - the UE2 default Hf film
-  - UCSB Hf (Zobrist et al. 2019, APL 115, 213503). Its published 97 µΩ·cm is the room
-    temperature value, so the preset uses 97/RRR with RRR = 1.6.
   - UCSB WHf.
 
-  The MKIDopt TOML configs carry the full provenance of each MKIDopt preset.
+  The MKIDopt TOML configs carry the full provenance of each MKIDopt preset. For the HfTa,
+  PtSi, and In/Hf devices the preset also holds the resonator (loaded Q, metal area of the
+  meander legs, f₀, bath temperature, τ_qp, α_k) and the θ₂ peak that MKIDopt simulates for
+  a 2 eV photon from the measured responsivity η₀. From that pulse the N₀ panel recovers
+  N₀ = η_pb·S₂/(Δ²·η₀): 1.47e47, 8.71e46, and 6.66e46 J⁻¹·m⁻³. MKIDopt's material blocks
+  still hold earlier values for PtSi (1.55e47) and In/Hf (1.23e47, the published
+  supplement value), about 1.8× higher.
 - **Elements:** Tc for the 30 ambient pressure elemental superconductors (Hg excluded), each
   tagged `film` or `bulk` with a source. A resistivity is stored only where a low
   temperature film value was found (Al, Ru, Ta). A bulk metal's residual resistivity is

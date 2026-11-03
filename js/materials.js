@@ -10,10 +10,11 @@
 
 /**
  * Lab and literature films. Each holds Tc [mK], ρ [µΩ·cm], t [nm], and optionally the gap
- * ratio (BCS when absent), a measured L□ [pH/sq] with `solve_gap: true` (the four values
- * over-determine the film, so the effective Δ/(k_B·Tc) is solved from them), and N₀ [J⁻¹m⁻³]
- * to prefill the N₀ panel. The MKIDopt entries mirror ../MKIDopt/mkidopt/materials.py and
- * its configs/*.toml, whose comments carry the full provenance.
+ * ratio (BCS when absent). The MKIDopt entries mirror ../MKIDopt/mkidopt/materials.py and the paper devices in its configs/*.toml,
+ * whose comments carry the full provenance. Their `photon` block prefills the N₀ panel with
+ * that resonator (loaded Q, metal area of the legs, f₀, bath temperature, phase decay time,
+ * α_k) and the linearized peak θ₂ that MKIDopt's run_simulation gives for a 2 eV photon from
+ * the measured responsivity, so the panel recovers N₀ = η_pb·S₂/(Δ²·η₀).
  */
 export const PRESETS = [
   {
@@ -26,30 +27,35 @@ export const PRESETS = [
   {
     id: 'mkidopt-hfta',
     name: 'HfTa, Tc 0.8 K (MKIDopt)',
-    tc_mK: 800, rho_uohmcm: 85.25, t_nm: 55, gap_ratio: 1.683, n0_per_J_m3: 1.54e47,
-    source: 'Unpublished 2026 (HfTa_Wo3_0p8K). Gap from a Mattis–Bardeen f₀(T) fit; ρ solved '
-      + 'for L□ = 28 pH/sq; N₀ from responsivity. Provisional',
+    tc_mK: 800, rho_uohmcm: 85.25, t_nm: 55, gap_ratio: 1.683,
+    photon: {
+      e_eV: 2, area_um2: 1200, q: 23503.0, f0_GHz: 3.8010414, temp_mK: 10, tau_us: 45,
+      alpha_k: 0.752976, eta_pb: 0.59, theta2_peak_deg: 106.5536,
+    },
+    source: 'Unpublished 2026 (HfTa_Wo3_0p8K), 3.80 GHz resonator. Gap from a Mattis–Bardeen '
+      + 'f₀(T) fit; ρ solved for L□ = 28 pH/sq. Provisional',
   },
   {
     id: 'mkidopt-ptsi',
     name: 'PtSi MEC (Zobrist 2019)',
-    tc_mK: 930, rho_uohmcm: 33.697, t_nm: 50, n0_per_J_m3: 1.5523e47,
-    source: 'Zobrist 2019, APL 115, 042601. ρ from the Szypryt 2016 (APL 109, 151102) '
-      + 'witness film, 8.2 pH/sq at 60 nm; N₀ from responsivity (MKIDopt)',
+    tc_mK: 930, rho_uohmcm: 33.697, t_nm: 50,
+    photon: {
+      e_eV: 2, area_um2: 1220.18, q: 19343.2, f0_GHz: 5.6745790, temp_mK: 100, tau_us: 46.32,
+      alpha_k: 0.816365, eta_pb: 0.59, theta2_peak_deg: 126.6845,
+    },
+    source: 'Zobrist 2019, APL 115, 042601, MEC resonator. ρ from the Szypryt 2016 (APL 109, '
+      + '151102) witness film, 8.2 pH/sq at 60 nm. MKIDopt\'s held material N₀ is 1.55e47',
   },
   {
     id: 'mkidopt-inhf',
     name: 'In/Hf bilayer (Zobrist 2022)',
-    tc_mK: 786, rho_uohmcm: 125.16980282, t_nm: 220, n0_per_J_m3: 1.23e47,
+    tc_mK: 786, rho_uohmcm: 125.16980282, t_nm: 220,
+    photon: {
+      e_eV: 2, area_um2: 1224, q: 17285.0, f0_GHz: 5.1112829, temp_mK: 13.6, tau_us: 386,
+      alpha_k: 0.855395, eta_pb: 0.59, theta2_peak_deg: 49.89728,
+    },
     source: 'Zobrist 2022, PRL 129, 017701. 220 nm Hf on 15 nm In; ρ solved for the measured '
-      + '10 pH/sq; N₀ from Supp. Table SI (published Hf values flagged as suspect)',
-  },
-  {
-    id: 'zobrist2019-hf',
-    name: 'UCSB Hf (Zobrist 2019)',
-    tc_mK: 395, rho_uohmcm: 97 / 1.6, t_nm: 125, lsq_pH: 16.7, solve_gap: true,
-    source: 'Zobrist 2019, APL 115, 213503. ρ = 97 µΩ·cm at 300 K / RRR 1.6; L□ = 16.7 pH/sq '
-      + 'from matching simulated to measured f₀',
+      + '10 pH/sq. Supp. Table SI gives N₀ = 1.23e47 (published Hf values flagged as suspect)',
   },
   {
     id: 'mkidopt-hf',

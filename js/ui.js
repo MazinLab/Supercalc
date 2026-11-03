@@ -86,6 +86,7 @@ function loadFields({ tc_mK, rho, t_nm, gap }) {
 /* ---- Panel 2: N0 / pulse height --------------------------------------- */
 
 let n0Driver = 'theta';                  // 'theta' computes N₀; 'n0' computes θ
+let isPulseFromPreset = false;           // θ came from a preset's resonator, not the user
 
 function recomputeN0() {
   const e_eV = num($('n_e')), area_um2 = num($('n_area')), q = num($('n_q'));
@@ -156,25 +157,33 @@ $('n_lambda').addEventListener('input', () => {
   $('n_e').value = l ? fmt(nmToEv(l)) : '';
   recomputeN0();
 });
-$('n_theta').addEventListener('input', () => { n0Driver = 'theta'; recomputeN0(); });
-$('n_n0_ev').addEventListener('input', () => { n0Driver = 'n0'; recomputeN0(); });
+$('n_theta').addEventListener('input', () => { n0Driver = 'theta'; isPulseFromPreset = false; recomputeN0(); });
+$('n_n0_ev').addEventListener('input', () => { n0Driver = 'n0'; isPulseFromPreset = false; recomputeN0(); });
 for (const id of ['n_area', 'n_q', 'n_f0', 'n_temp', 'n_tau', 'n_alpha', 'n_eta']) {
   $(id).addEventListener('input', recomputeN0);
 }
 $('n_theta_kind').addEventListener('change', recomputeN0);
 
 /**
- * A new material brings its own N₀, or none: a held N₀, and the θ predicted from it,
- * belonged to the previous material, so clear them. A measured θ stays.
+ * Prefill the N₀ panel with a preset's paper resonator and photon pulse. A material without
+ * one clears a pulse or N₀ that belonged to the previous material; a θ the user typed stays.
  */
-function loadMaterialN0(n0_per_J_m3) {
-  if (n0_per_J_m3) {
-    $('n_n0_ev').value = fmt(n0ToEvUm3(n0_per_J_m3));
-    n0Driver = 'n0';
-  } else if (n0Driver === 'n0') {
-    $('n_n0_ev').value = '';
-    $('n_theta').value = '';
+function loadPhoton(photon) {
+  if (photon) {
+    const fields = {
+      n_e: photon.e_eV, n_lambda: evToNm(photon.e_eV), n_area: photon.area_um2, n_q: photon.q,
+      n_f0: photon.f0_GHz, n_temp: photon.temp_mK, n_tau: photon.tau_us, n_alpha: photon.alpha_k,
+      n_eta: photon.eta_pb, n_theta: photon.theta2_peak_deg,
+    };
+    for (const [id, v] of Object.entries(fields)) $(id).value = fmt(v);
+    $('n_theta_kind').value = 'linear';
     n0Driver = 'theta';
+    isPulseFromPreset = true;
+  } else if (isPulseFromPreset || n0Driver === 'n0') {
+    $('n_theta').value = '';
+    $('n_n0_ev').value = '';
+    n0Driver = 'theta';
+    isPulseFromPreset = false;
   }
   recomputeN0();
 }
@@ -187,20 +196,15 @@ for (const p of PRESETS) {
   btn.className = 'preset-btn';
   btn.innerHTML = `${p.name}<small>${p.source}</small>`;
   btn.addEventListener('click', () => {
-    // Solve the consistent state from the stored values, then prefill holding the intrinsic
-    // material properties (Tc, ρ, gap) and the thickness, so changing t recomputes L□, not ρ.
-    const solved = solveTop({
-      tc_mK: p.tc_mK, rho: p.rho_uohmcm, t_nm: p.t_nm, lsq: p.lsq_pH,
-      gap: p.solve_gap ? null : p.gap_ratio,
-    });
-    loadFields({ tc_mK: solved.tc_mK, rho: solved.rho, t_nm: solved.t_nm, gap: solved.gap });
-    loadMaterialN0(p.n0_per_J_m3);
-    const holding = p.solve_gap
-      ? `Gap ratio Δ/(k_B·Tc) = ${fmt(solved.gap)} solved from the stored L□`
-      : `Holding ρ = ${fmt(solved.rho)} µΩ·cm`;
-    const where = solved.t_nm != null ? 'change thickness to update L□' : 'enter a thickness to get L□';
-    const n0Note = p.n0_per_J_m3 ? ' Its N₀ is loaded into the N₀ panel.' : '';
-    $('impedance_msg').textContent = `Loaded ${p.name}. ${holding}; ${where}.${n0Note}`;
+    // Hold the intrinsic material properties (Tc, ρ, gap) and the thickness, so changing t
+    // recomputes L□, not ρ.
+    loadFields({ tc_mK: p.tc_mK, rho: p.rho_uohmcm, t_nm: p.t_nm, gap: p.gap_ratio });
+    loadPhoton(p.photon);
+    const where = p.t_nm != null ? 'change thickness to update L□' : 'enter a thickness to get L□';
+    const n0Note = p.photon
+      ? ` Its paper resonator and a ${fmt(p.photon.e_eV)} eV photon fill the N₀ panel.` : '';
+    $('impedance_msg').textContent =
+      `Loaded ${p.name}. Holding ρ = ${fmt(p.rho_uohmcm)} µΩ·cm; ${where}.${n0Note}`;
   });
   $('presetList').appendChild(btn);
 }
@@ -210,7 +214,7 @@ for (const p of PRESETS) {
 let selectedCell = null;
 renderPeriodicTable($('ptableContainer'), (symbol, data) => {
   loadFields({ tc_mK: data.tc_mK, rho: data.rho_uohmcm });
-  loadMaterialN0(null);
+  loadPhoton(null);
   const rhoTxt = data.rho_uohmcm != null
     ? `ρ ${data.rho_uohmcm} µΩ·cm`
     : 'no low-temperature film ρ stored, so enter your film\'s';
