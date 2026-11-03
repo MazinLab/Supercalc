@@ -108,13 +108,14 @@ References:
 All material data is stored in `js/materials.js` (no live fetch).
 
 - **Presets:**
-  - UCSB Nb, 125 nm. ρ = ρ(300 K)/RRR from a four probe run.
+  - UCSB films from four probe runs: Nb (125 nm), Hf (Tc 503 mK), and HfTa at three Ta
+    powers (Tc 836, 1107, and 2986 mK). Each uses ρ = ρ(300 K)/RRR and the low end of the
+    resistive transition as Tc.
   - From MKIDopt:
     - HfTa with Tc = 0.8 K (unpublished 2026, provisional)
     - PtSi from the MEC array (Zobrist et al. 2019, APL 115, 042601)
     - the In/Hf bilayer (Zobrist et al. 2022, PRL 129, 017701)
     - the UE2 default Hf film
-  - UCSB WHf.
 
   The MKIDopt TOML configs carry the full provenance of each MKIDopt preset. For the HfTa,
   PtSi, and In/Hf devices the preset also holds the resonator (loaded Q, metal area of the

@@ -17,12 +17,42 @@
  * the measured responsivity, so the panel recovers N₀ = η_pb·S₂/(Δ²·η₀).
  */
 export const PRESETS = [
+  // UCSB four-probe runs: ρ = ρ(300 K)/RRR, Tc is the sheet's "transition temperature", the
+  // low end of the resistive transition; the source notes its midpoint and onset.
   {
     id: 'ucsb-nb',
     name: 'UCSB Nb (125 nm)',
-    tc_mK: 8550.88, rho_uohmcm: 5.810, t_nm: 125,
-    source: 'Nb-20C-200W-300sccm-1.2mT, 26.4 min at 4.73 nm/min. 4-probe: ρ(300 K) 21.98 µΩ·cm, '
-      + 'RRR 3.78; ρ, RRR less certain on this thick film. Tc midpoint 8833 mK',
+    tc_mK: 8551, rho_uohmcm: 21.98 / 3.783, t_nm: 124.9,
+    source: '[Nb]-[20]C-[30]sccm-[1.2]mT-[200]W-[26.4]min. ρ(300 K) 21.98 µΩ·cm, RRR 3.78 '
+      + '(less certain on this thick film); Tc midpoint 8833, onset 9116 mK',
+  },
+  {
+    id: 'ucsb-hf',
+    name: 'UCSB Hf, Tc 503 mK',
+    tc_mK: 503, rho_uohmcm: 112.89 / 1.451, t_nm: 49.9,
+    source: '[Hf]-[20]C-[30]sccm-[2]mT-[150]W-[5]min. ρ(300 K) 112.89 µΩ·cm, RRR 1.451; '
+      + 'Tc midpoint 544, onset 584 mK',
+  },
+  {
+    id: 'ucsb-hfta-836',
+    name: 'UCSB HfTa, Tc 836 mK',
+    tc_mK: 836, rho_uohmcm: 141.60 / 1.386, t_nm: 60.0,
+    source: '[TaRF+Hf]-[20]C-[30]sccm-[2]mT-[32,150]W-[5]min. ρ(300 K) 141.60 µΩ·cm, RRR 1.386; '
+      + 'Tc midpoint 857, onset 877 mK',
+  },
+  {
+    id: 'ucsb-hfta-1107',
+    name: 'UCSB HfTa, Tc 1107 mK',
+    tc_mK: 1107, rho_uohmcm: 134.88 / 1.409, t_nm: 52.8,
+    source: '[TaRF+Hf]-[20]C-[30]sccm-[2]mT-[40,150]W-[5]min. ρ(300 K) 134.88 µΩ·cm, RRR 1.409; '
+      + 'Tc midpoint 1127, onset 1147 mK',
+  },
+  {
+    id: 'ucsb-hfta-2986',
+    name: 'UCSB HfTa, Tc 2986 mK',
+    tc_mK: 2986, rho_uohmcm: 154.38 / 1.094, t_nm: 59.4,
+    source: '[TaRF+Hf]-[20]C-[30]sccm-[2]mT-[100,150]W-[5]min. ρ(300 K) 154.38 µΩ·cm, RRR 1.094; '
+      + 'broad transition: Tc midpoint 3460, onset 3935 mK',
   },
   {
     id: 'mkidopt-hfta',
@@ -62,12 +92,6 @@ export const PRESETS = [
     name: 'Hf, UE2 default (MKIDopt)',
     tc_mK: 400, rho_uohmcm: 60.6, t_nm: 200,
     source: 'MKIDopt HF_FILM: ρ is the Zobrist 2022 supplement Hf-on-Si value at 4 K',
-  },
-  {
-    id: 'ucsb-whf',
-    name: 'UCSB WHf',
-    tc_mK: 450, rho_uohmcm: 70.7, t_nm: null,
-    source: 'UCSB WHf bilayer',
   },
 ];
 
