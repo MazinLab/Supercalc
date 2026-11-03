@@ -69,7 +69,7 @@ for (const k of IMP_KEYS) {
   impEl[k].addEventListener('input', () => { pin(k); recomputeImpedance(); });
 }
 $('f_gap').addEventListener('input', recomputeImpedance);
-$('clearImpedance').addEventListener('click', () => loadFields({}));
+$('clearImpedance').addEventListener('click', () => { loadFields({}); loadPhoton(null); });
 
 /** Prefill the linked fields; a missing gap resets to the BCS ratio. */
 function loadFields({ tc_mK, rho, t_nm, gap }) {
@@ -86,7 +86,6 @@ function loadFields({ tc_mK, rho, t_nm, gap }) {
 /* ---- Panel 2: N0 / pulse height --------------------------------------- */
 
 let n0Driver = 'theta';                  // 'theta' computes N₀; 'n0' computes θ
-let isPulseFromPreset = false;           // θ came from a preset's resonator, not the user
 
 function recomputeN0() {
   const e_eV = num($('n_e')), area_um2 = num($('n_area')), q = num($('n_q'));
@@ -157,34 +156,30 @@ $('n_lambda').addEventListener('input', () => {
   $('n_e').value = l ? fmt(nmToEv(l)) : '';
   recomputeN0();
 });
-$('n_theta').addEventListener('input', () => { n0Driver = 'theta'; isPulseFromPreset = false; recomputeN0(); });
-$('n_n0_ev').addEventListener('input', () => { n0Driver = 'n0'; isPulseFromPreset = false; recomputeN0(); });
+$('n_theta').addEventListener('input', () => { n0Driver = 'theta'; recomputeN0(); });
+$('n_n0_ev').addEventListener('input', () => { n0Driver = 'n0'; recomputeN0(); });
 for (const id of ['n_area', 'n_q', 'n_f0', 'n_temp', 'n_tau', 'n_alpha', 'n_eta']) {
   $(id).addEventListener('input', recomputeN0);
 }
 $('n_theta_kind').addEventListener('change', recomputeN0);
 
-/**
- * Prefill the N₀ panel with a preset's paper resonator and photon pulse. A material without
- * one clears a pulse or N₀ that belonged to the previous material; a θ the user typed stays.
- */
+// N₀-panel inputs as a new material leaves them: blank but for the α_k and η_pb defaults.
+const N0_PANEL_DEFAULTS = {
+  n_e: null, n_lambda: null, n_area: null, n_q: null, n_f0: null, n_temp: null, n_tau: null,
+  n_alpha: 1.0, n_eta: ETA_PB, n_theta: null, n_n0_ev: null,
+};
+
+/** Reset the N₀ panel for a new material, filled with its paper resonator and photon if it has one. */
 function loadPhoton(photon) {
-  if (photon) {
-    const fields = {
-      n_e: photon.e_eV, n_lambda: evToNm(photon.e_eV), n_area: photon.area_um2, n_q: photon.q,
-      n_f0: photon.f0_GHz, n_temp: photon.temp_mK, n_tau: photon.tau_us, n_alpha: photon.alpha_k,
-      n_eta: photon.eta_pb, n_theta: photon.theta2_peak_deg,
-    };
-    for (const [id, v] of Object.entries(fields)) $(id).value = fmt(v);
-    $('n_theta_kind').value = 'linear';
-    n0Driver = 'theta';
-    isPulseFromPreset = true;
-  } else if (isPulseFromPreset || n0Driver === 'n0') {
-    $('n_theta').value = '';
-    $('n_n0_ev').value = '';
-    n0Driver = 'theta';
-    isPulseFromPreset = false;
-  }
+  const values = !photon ? N0_PANEL_DEFAULTS : {
+    ...N0_PANEL_DEFAULTS,
+    n_e: photon.e_eV, n_lambda: evToNm(photon.e_eV), n_area: photon.area_um2, n_q: photon.q,
+    n_f0: photon.f0_GHz, n_temp: photon.temp_mK, n_tau: photon.tau_us, n_alpha: photon.alpha_k,
+    n_eta: photon.eta_pb, n_theta: photon.theta2_peak_deg,
+  };
+  for (const [id, v] of Object.entries(values)) $(id).value = fmt(v);
+  $('n_theta_kind').value = photon ? 'linear' : 'loop';
+  n0Driver = 'theta';
   recomputeN0();
 }
 
@@ -226,5 +221,5 @@ renderPeriodicTable($('ptableContainer'), (symbol, data) => {
   }
 });
 
-$('n_eta').value = String(ETA_PB);
+loadPhoton(null);
 recomputeImpedance();                    // show the initial readouts and hint message

@@ -40,8 +40,9 @@ deployable as-is on GitHub Pages.
 
    It computes the single spin N₀ in eV⁻¹·µm⁻³ and J⁻¹·m⁻³, and, with ρ from panel 1,
    the diffusion constant D and the dirty limit coherence length ξ. The panel also runs
-   backward, from an entered N₀ to the predicted θ. The three paper device presets fill it
-   with their resonator and a 2 eV photon.
+   backward, from an entered N₀ to the predicted θ. Choosing a material or clearing panel 1
+   resets this panel, and the three paper device presets fill it with their resonator and a
+   2 eV photon. Editing a film property in panel 1 recomputes it.
 
 3. **Material explorer.** A periodic table of the ambient pressure elemental
    superconductors. Each clickable cell shows its Tc (gold above 1.3 K, blue below). Click
